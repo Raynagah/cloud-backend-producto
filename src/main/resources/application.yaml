@@ -1,0 +1,38 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ms-producto
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID}/v2.0
+
+  # CONFIGURACIÓN DE DATASOURCE MEDIANTE VARIABLES DE ENTORNO
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/db_producto}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password_seguro}
+
+  # CONFIGURACIÓN DE JPA E HIBERNATE PARA POSTGRESQL
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+# CONFIGURACIÓN DE SPRINGDOC (SWAGGER) PARA DOCUMENTACIÓN
+springdoc:
+  show-actuator: true
+  swagger-ui:
+    use-root-path: true
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+  api-docs:
+    path: /api/producto/v1/api-docs
