@@ -9,7 +9,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID}/v2.0
+          issuer-uri: https://login.microsoftonline.com/78b145ef-56b9-4397-b87c-27b242a9fce5
 
   # CONFIGURACIÓN DE DATASOURCE MEDIANTE VARIABLES DE ENTORNO
   datasource:
