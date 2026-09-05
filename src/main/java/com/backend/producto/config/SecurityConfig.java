@@ -1,6 +1,7 @@
 package com.backend.producto.config;
 
 import java.util.List;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,16 +22,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String issuerUri;
-
-    @Value("${spring.security.oauth2.resourceserver.jwt.tenant-id}")
-    private String tenantId;
+    // Leemos la MISMA clave secreta que usa ms-usuarios
+    @Value("${jwt.secret:UnaClaveSecretaMuyLargaYSeguraParaPoderFirmarElToken256BitsMinimo!}")
+    private String jwtSecret;
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        String jwkSetUri = issuerUri + tenantId + "/discovery/v2.0/keys";
-        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+        // Configuramos el decodificador para usar la clave simétrica (HS256) en lugar de Azure
+        SecretKeySpec secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
+        return NimbusJwtDecoder.withSecretKey(secretKey).build();
     }
 
     @Bean
@@ -55,13 +55,13 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
             .authorizeHttpRequests(authz -> authz
-                // 1. Permitir peticiones preflight (OPTIONS) de CORS vital para el navegador
+                // 1. Permitir peticiones preflight (OPTIONS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 
-                // 2. Permitir acceso público a la documentación de Swagger
+                // 2. Permitir Swagger
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/producto/v1/api-docs/**").permitAll()
                 
-                // 3. Requerir autenticación para cualquier otra ruta (incluyendo productos)
+                // 3. Requerir autenticación para el resto
                 .anyRequest().authenticated()
             )
             
