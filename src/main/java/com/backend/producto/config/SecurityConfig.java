@@ -37,7 +37,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // Permite el origen de tu frontend hospedado en API Gateway
-        config.setAllowedOriginPatterns(List.of("https://peq4cfx9b1.execute-api.us-east-1.amazonaws.com"));
+        config.setAllowedOriginPatterns(List.of("https://n2mnxks3b7.execute-api.us-east-1.amazonaws.com"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
