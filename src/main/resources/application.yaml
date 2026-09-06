@@ -5,6 +5,12 @@ spring:
   application:
     name: ms-producto
 
+  security: 
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://login.microsoftonline.com/
+          tenant-id: 78b145ef-56b9-4397-b87c-27b242a9fce5
   # CONFIGURACIÓN DE DATASOURCE MEDIANTE VARIABLES DE ENTORNO
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/db_producto}
@@ -19,10 +25,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-
-# CONFIGURACIÓN DE SEGURIDAD (La misma clave que usa ms-usuarios)
-jwt:
-  secret: UnaClaveSecretaMuyLargaYSeguraParaPoderFirmarElToken256BitsMinimo!
 
 # CONFIGURACIÓN DE SPRINGDOC (SWAGGER) PARA DOCUMENTACIÓN
 springdoc:

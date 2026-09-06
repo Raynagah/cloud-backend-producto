@@ -1,7 +1,6 @@
 package com.backend.producto.config;
 
 import java.util.List;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,15 +21,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // Leemos la MISMA clave secreta que usa ms-usuarios
-    @Value("${jwt.secret:UnaClaveSecretaMuyLargaYSeguraParaPoderFirmarElToken256BitsMinimo!}")
-    private String jwtSecret;
+    // Recuperamos las variables de entorno de Azure
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.tenant-id}")
+    private String tenantId;
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        // Configuramos el decodificador para usar la clave simétrica (HS256) en lugar de Azure
-        SecretKeySpec secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
-        return NimbusJwtDecoder.withSecretKey(secretKey).build();
+        // Configuramos el decodificador para que vaya a buscar las llaves públicas de Microsoft
+        String jwkSetUri = issuerUri + tenantId + "/discovery/v2.0/keys";
+        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 
     @Bean
@@ -71,7 +73,7 @@ public class SecurityConfig {
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
                     response.setContentType("application/json");
                     response.getWriter().write(
-                            "{\"error\": \"No autorizado\", \"mensaje\": \"Debes enviar un token Bearer valido para acceder a este recurso.\"}");
+                            "{\"error\": \"No autorizado\", \"mensaje\": \"Debes enviar un token Bearer valido de Microsoft para acceder a este recurso.\"}");
                 })
             );
             
