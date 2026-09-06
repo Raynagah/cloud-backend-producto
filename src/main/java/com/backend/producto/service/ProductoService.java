@@ -11,4 +11,5 @@ public interface ProductoService {
     ProductoResponseDTO obtenerPorId(Long id);
     ProductoResponseDTO actualizarProducto(Long id, ProductoRequestDTO requestDTO);
     void eliminarProducto(Long id);
+    void actualizarStock(Long id, Integer cantidadVariacion);
 }

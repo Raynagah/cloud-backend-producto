@@ -72,4 +72,17 @@ public class ProductoServiceImpl implements ProductoService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Producto no encontrado con el ID: " + id));
     }
+
+    @Override
+    public void actualizarStock(Long id, Integer cantidadVariacion) {
+    Producto producto = buscarProductoPorIdOpcional(id);
+    
+    int nuevoStock = producto.getStock() + cantidadVariacion;
+    if (nuevoStock < 0) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para el producto: " + producto.getNombre());
+    }
+    
+    producto.setStock(nuevoStock);
+    productoRepository.save(producto);
+}
 }

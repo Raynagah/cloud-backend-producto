@@ -48,4 +48,12 @@ public class ProductoController {
         productoService.eliminarProducto(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<Void> actualizarStock(
+            @PathVariable Long id, 
+            @RequestParam Integer cantidadVariacion) {
+        productoService.actualizarStock(id, cantidadVariacion);
+        return ResponseEntity.ok().build();
+    }
 }
