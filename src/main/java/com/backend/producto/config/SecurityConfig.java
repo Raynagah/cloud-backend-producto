@@ -59,6 +59,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // 1. Permitir peticiones preflight (OPTIONS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
                 
                 // 2. Permitir Swagger
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/producto/v1/api-docs/**").permitAll()

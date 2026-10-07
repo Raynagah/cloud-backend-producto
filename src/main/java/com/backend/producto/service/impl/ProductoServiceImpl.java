@@ -1,17 +1,19 @@
 package com.backend.producto.service.impl;
 
-import com.backend.producto.dto.ProductoRequestDTO;
-import com.backend.producto.dto.ProductoResponseDTO;
-import com.backend.producto.model.Producto;
-import com.backend.producto.mapper.ProductoMapper;
-import com.backend.producto.repository.ProductoRepository;
-import com.backend.producto.service.ProductoService;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.backend.producto.dto.ProductoRequestDTO;
+import com.backend.producto.dto.ProductoResponseDTO;
+import com.backend.producto.mapper.ProductoMapper;
+import com.backend.producto.model.Producto;
+import com.backend.producto.repository.ProductoRepository;
+import com.backend.producto.service.ProductoService;
 
 @Service
 public class ProductoServiceImpl implements ProductoService {
@@ -70,19 +72,36 @@ public class ProductoServiceImpl implements ProductoService {
     private Producto buscarProductoPorIdOpcional(Long id) {
         return productoRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Producto no encontrado con el ID: " + id));
+                HttpStatus.NOT_FOUND, "Producto no encontrado con el ID: " + id));
     }
 
     @Override
     public void actualizarStock(Long id, Integer cantidadVariacion) {
-    Producto producto = buscarProductoPorIdOpcional(id);
-    
-    int nuevoStock = producto.getStock() + cantidadVariacion;
-    if (nuevoStock < 0) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para el producto: " + producto.getNombre());
+        Producto producto = buscarProductoPorIdOpcional(id);
+
+        int nuevoStock = producto.getStock() + cantidadVariacion;
+        if (nuevoStock < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para el producto: " + producto.getNombre());
+        }
+
+        producto.setStock(nuevoStock);
+        productoRepository.save(producto);
     }
-    
-    producto.setStock(nuevoStock);
-    productoRepository.save(producto);
-}
+
+    @Override
+    @Transactional
+    public void descontarStockAsincrono(Long productoId, Integer cantidad) {
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado ID: " + productoId));
+
+        int nuevoStock = producto.getStock() - cantidad;
+        if (nuevoStock < 0) {
+            System.err.println("Advertencia: Stock insuficiente para el producto ID " + productoId + ". Stock actual: " + producto.getStock());
+            nuevoStock = 0; // Evita stock negativo
+        }
+
+        producto.setStock(nuevoStock);
+        productoRepository.save(producto);
+        System.out.println("Stock actualizado para Funko ID " + productoId + ". Nuevo stock: " + nuevoStock);
+    }
 }
