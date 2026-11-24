@@ -25,6 +25,10 @@ spring:
     username: ${RABBITMQ_USER:admin}
     password: ${RABBITMQ_PASSWORD:admin}
 
+  # CONFIGURACIÓN DE KAFKA (eventos de comportamiento -> ms-analytics-recommendations)
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:localhost:9092}
+
   # CONFIGURACIÓN DE JPA E HIBERNATE PARA POSTGRESQL
   jpa:
     hibernate:
